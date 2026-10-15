@@ -1,4 +1,8 @@
 
+using BookProject.Data;
+using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
+
 namespace BookProject
 {
     public class Program
@@ -13,12 +17,20 @@ namespace BookProject
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
+            //EntityFramework beállítás
+            builder.Services.AddDbContext<BookDbContext>(options =>
+            {
+                options.UseMySql(builder.Configuration.GetConnectionString("BookDbContext"),
+                ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("BookDbContext")));
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
+                app.MapScalarApiReference();
             }
 
             app.UseHttpsRedirection();
