@@ -1,0 +1,132 @@
+{
+  "info": {
+    "_postman_id": "1abca0f9-80ff-4e5c-9652-846c06fd6110",
+    "name": "BookProject",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "57936848",
+    "_collection_link": "https://go.postman.co/collection/57936848-1abca0f9-80ff-4e5c-9652-846c06fd6110?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "GET - Authors",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:7047/api/Authors",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7047",
+          "path": [
+            "api",
+            "Authors"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST - Author",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"name\": \"Sisi királyné\",\r\n  \"dateOfBirth\": \"1837-12-24\",\r\n  \"placeOfBirth\": \"Munchen\",\r\n  \"active\": true\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://localhost:7047/api/Authors",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7047",
+          "path": [
+            "api",
+            "Authors"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET - Author",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:7047/api/Authors/2",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7047",
+          "path": [
+            "api",
+            "Authors",
+            "2"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT - Author",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"id\": 1,\r\n    \"name\": \"Mao Ce-tung\",\r\n    \"dateOfBirth\": \"1893-12-26T00:00:00\",\r\n    \"placeOfBirth\": \"Saosan\",\r\n    \"active\": true\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://localhost:7047/api/Authors/1",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7047",
+          "path": [
+            "api",
+            "Authors",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE - Author",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:7047/api/Authors/4",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7047",
+          "path": [
+            "api",
+            "Authors",
+            "4"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
