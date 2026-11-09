@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BookProject.Models;
 using BookProject.Data;
+using BookProject.Dtos.Author;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -15,14 +16,23 @@ public class AuthorsController : ControllerBase
 
     // GET: api/Authorwoof
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Authorwoof>>> GetAuthorwoof()
+    public async Task<ActionResult<IEnumerable<AuthorReadDto>>> GetAuthorwoof()
     {
-        return await _context.Authors.ToListAsync();
+        return await _context.Authors.Select(a =>
+            new AuthorReadDto
+            {
+                Id = a.Id,
+                Name = a.Name,
+                DateOfBirth = a.DateOfBirth,
+                PlaceOfBirth = a.PlaceOfBirth,
+                BirthDateAndPlace = a.PlaceOfBirth + ", " +DateOnly.FromDateTime(a.DateOfBirth)
+            }
+            ).ToListAsync();
     }
 
     // GET: api/Authorwoof/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<Authorwoof>> GetAuthorwoof(int id)
+    public async Task<ActionResult<AuthorReadDto>> GetAuthorwoof(int id)
     {
         var authorwoof = await _context.Authors.FindAsync(id);
 
@@ -31,7 +41,16 @@ public class AuthorsController : ControllerBase
             return NotFound();
         }
 
-        return authorwoof;
+        var authorDto = new AuthorReadDto
+        {
+            Id = authorwoof.Id,
+            Name = authorwoof.Name,
+            DateOfBirth = authorwoof.DateOfBirth,
+            PlaceOfBirth = authorwoof.PlaceOfBirth,
+            BirthDateAndPlace = authorwoof.PlaceOfBirth +", "+authorwoof.DateOfBirth.ToString("yyyy.MM.dd")
+        };
+
+        return authorDto;
     }
 
     // PUT: api/Authorwoof/5
