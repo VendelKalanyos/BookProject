@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BookProject.Models;
 using BookProject.Data;
+using BookProject.Dtos.Book;
+using System.Reflection.Metadata.Ecma335;
+using Microsoft.AspNetCore.Mvc.Routing;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -15,11 +18,11 @@ public class BooksController : ControllerBase
 
     // GET: api/Book miau
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Object>>> GetBook()
+    public async Task<ActionResult<IEnumerable<BookReadDto>>> GetBook()
     {
         //return await _context.Books.ToListAsync();
 
-        var books = await _context.Books.Select(x => new 
+        var books = await _context.Books.Select(x => new BookReadDto
         {
             Id = x.Id,
             Title = x.Title,
@@ -27,7 +30,8 @@ public class BooksController : ControllerBase
             PublishedYear = x.PublishedYear,
             Pages = x.Pages,
             //Author = x.Author != null ? x.Author.Name : "Ismeretlen szerző"
-            Author = x.Author.Name ?? "Ismeretlen szerző"
+            Author = x.Author.Name ?? "Ismeretlen szerző",
+            AuthorId = x.AuthorId,
         }).ToListAsync();
 
         return books;
@@ -35,7 +39,7 @@ public class BooksController : ControllerBase
 
     // GET: api/Book/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<Object>> GetBook(int id)
+    public async Task<ActionResult<BookReadDto>> GetBook(int id)
     {
         var book = await _context.Books.Include(x => x.Author).FirstOrDefaultAsync(b => b.Id == id);
 
@@ -44,7 +48,7 @@ public class BooksController : ControllerBase
             return NotFound();
         }
 
-        return new
+        return new BookReadDto
         {
             Id = book.Id,
             Title = book.Title,
@@ -52,21 +56,36 @@ public class BooksController : ControllerBase
             PublishedYear = book.PublishedYear,
             Pages = book.Pages,
             //Author = book.Author != null ? x.Author.Name : "Ismeretlen szerző"
-            Author = book.Author?.Name ?? "Ismeretlen szerző"
+            Author = book.Author?.Name ?? "Ismeretlen szerző",
+            AuthorId = book.AuthorId 
         };
     }
 
     // PUT: api/Book/5
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutBook(int? id, Book book)
+    public async Task<IActionResult> PutBook(int? id, BookUpdateDto bookDto)
     {
-        if (id != book.Id)
+
+        if (id != bookDto.Id)
         {
             return BadRequest();
         }
 
-        _context.Entry(book).State = EntityState.Modified;
+        var book = await _context.Books.FindAsync(id);
+        var author = await _context.Authors.FindAsync(bookDto.AuthorId);
+
+        if (book == null) return NotFound("A könyv nem létezik!");
+        if (author == null) return NotFound("A szerő nem létezik!");
+
+        book.AuthorId = bookDto.AuthorId;
+        book.Title = bookDto.Title;
+        book.Available = bookDto.Available;
+        book.Category = bookDto.Category;
+        book.PublishedYear = bookDto.PublishedYear;
+        book.Pages = bookDto.Pages;
+
+        //_context.Entry(book).State = EntityState.Modified;
 
         try
         {
@@ -90,12 +109,38 @@ public class BooksController : ControllerBase
     // POST: api/Book
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost]
-    public async Task<ActionResult<Book>> PostBook(Book book)
+    public async Task<ActionResult<BookReadDto>> PostBook(BookCreateDto bookDto)
     {
+        var author = await _context.Authors.FindAsync(bookDto.AuthorId);
+
+        if (author == null) { return NotFound("Nincs ilyen szerző(=csengőfrász elvitték, imperialista ügynök volt grrr)"); }
+
+        var book = new Book
+        {
+            Title = bookDto.Title,
+            Category = bookDto.Category,
+            AuthorId = bookDto.AuthorId,
+            Pages = bookDto.Pages,
+            PublishedYear = bookDto.PublishedYear,
+            Active = true
+        };
+
         _context.Books.Add(book);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction("GetBook", new { id = book.Id }, book);
+        var newbook = new BookReadDto
+        {
+            Id = book.Id,
+            Title = book.Title,
+            Pages = book.Pages,
+            PublishedYear = book.PublishedYear,
+            Category = book.Category,
+            AuthorId = book.AuthorId,
+            Author = author.Name
+
+        };
+
+        return CreatedAtAction("GetBook", new { id = book.Id }, newbook);
     }
 
     // DELETE: api/Book/5

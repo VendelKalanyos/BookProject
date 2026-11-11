@@ -56,14 +56,24 @@ public class AuthorsController : ControllerBase
     // PUT: api/Authorwoof/5
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutAuthorwoof(int? id, Authorwoof authorwoof)
+    public async Task<IActionResult> PutAuthorwoof(int? id, AuthorUpdateDto authorDto)
     {
-        if (id != authorwoof.Id)
+        if (id != authorDto.Id)
         {
             return BadRequest();
         }
 
-        _context.Entry(authorwoof).State = EntityState.Modified;
+        var author = await _context.Authors.FindAsync(id);
+        if (author == null)
+        {
+            return NotFound("A megadott szerő nem létezik(fekete listas)");
+        }
+
+        author.Name = authorDto.Name;
+        author.DateOfBirth = authorDto.DateOfBirth;
+        author.PlaceOfBirth = authorDto.PlaceOfBirth;
+
+        //_context.Entry(authorwoof).State = EntityState.Modified;
 
         try
         {
@@ -87,12 +97,29 @@ public class AuthorsController : ControllerBase
     // POST: api/Authorwoof
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost]
-    public async Task<ActionResult<Authorwoof>> PostAuthorwoof(Authorwoof authorwoof)
+    public async Task<ActionResult<AuthorReadDto>> PostAuthorwoof(AuthorCreateDto authorDto)
     {
-        _context.Authors.Add(authorwoof);
+        var author = new Authorwoof
+        {
+            Name = authorDto.Name,
+            DateOfBirth = authorDto.DateOfBirth,
+            PlaceOfBirth = authorDto.PlaceOfBirth,
+            Active = true
+        };
+
+        _context.Authors.Add(author);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction("GetAuthorwoof", new { id = authorwoof.Id }, authorwoof);
+        var newauthor = new AuthorReadDto
+        {
+            Id = author.Id,
+            Name = author.Name,
+            DateOfBirth = author.DateOfBirth,
+            PlaceOfBirth = author.PlaceOfBirth,
+            BirthDateAndPlace = $"{author.PlaceOfBirth}, {author.DateOfBirth.ToString("yyyy.MM.dd")}"
+        };
+
+        return CreatedAtAction("GetAuthorwoof", new { id = author.Id }, newauthor);
     }
 
     // DELETE: api/Authorwoof/5

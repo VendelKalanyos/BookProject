@@ -13,5 +13,7 @@
         public bool Available { get; set; }
 
         public int? AuthorId { get; set; }
+
+        public string Author { get; set; } = string.Empty;
     }
 }
