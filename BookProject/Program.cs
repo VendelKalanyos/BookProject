@@ -20,8 +20,8 @@ namespace BookProject
             //EntityFramework beállítás
             builder.Services.AddDbContext<BookDbContext>(options =>
             {
-                options.UseMySql(builder.Configuration.GetConnectionString("BookDbContext"),
-                ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("BookDbContext")));
+                options.UseSqlite(builder.Configuration.GetConnectionString("BookDbContext"));
+                //ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("BookDbContext")));
             });
 
             var app = builder.Build();
